@@ -1484,3 +1484,41 @@ a {
   justify-content: center;
   flex-wrap: wrap;
 }
+
+/* Selection */
+.topbar,
+.logo,
+.actions,
+.sheet-head,
+.sheet-section h3,
+.field-label,
+.repo-head,
+.row,
+.grip,
+.btn,
+.icon-btn,
+.filter-chip,
+.segmented,
+.switch-row,
+.shapes,
+.swatches,
+.presets,
+.tray,
+.get-option,
+.steps,
+.work-steps,
+.block-tools {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body:has(.grip:active) {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
