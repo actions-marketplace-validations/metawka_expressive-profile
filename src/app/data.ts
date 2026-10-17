@@ -126,7 +126,7 @@ function daysFromEvents(events: any[]) {
   return { days: out, total, streak: streakOf(series) };
 }
 
-type Loaded = { data: Data; avatar: string | null; stale?: boolean };
+type Loaded = { data: Data; avatar: string | null; stale?: boolean; exact?: boolean };
 const cache = new Map<string, Promise<Loaded>>();
 const FRESH = 30 * 60 * 1000;
 
@@ -202,7 +202,27 @@ async function fetchProfile(login: string) {
     all,
   };
   const avatar = await toDataUrl(`${user.avatar_url}${user.avatar_url.includes("?") ? "&" : "?"}s=320`);
-  return { data, avatar, name: user.name as string | null };
+  const saved = await actionData(login);
+  if (saved) {
+    data.pins = saved.pins ?? data.pins;
+    data.languages = saved.languages ?? data.languages;
+    data.contributions = saved.contributions ?? data.contributions;
+    data.stars = saved.stars ?? data.stars;
+    data.streak = saved.streak ?? data.streak;
+  }
+  return { data, avatar, name: user.name as string | null, exact: !!saved };
+}
+
+async function actionData(login: string): Promise<Partial<Data> | null> {
+  try {
+    const name = encodeURIComponent(login);
+    const r = await fetch(`https://raw.githubusercontent.com/${name}/${name}/HEAD/.profile/data.json`);
+    if (!r.ok) return null;
+    const j = await r.json();
+    return Array.isArray(j.pins) ? j : null;
+  } catch {
+    return null;
+  }
 }
 
 // Zip

@@ -1,7 +1,7 @@
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, Reorder, useDragControls } from "motion/react";
 import { useState } from "react";
 import { projectList, projectView } from "../render/blocks";
-import type { Config, Data, SchemeName } from "../render";
+import type { Config, Data, Repo, SchemeName } from "../render";
 import type { Dict } from "./i18n";
 import { activePreset, applyPreset, PRESETS, type PresetId } from "./presets";
 import { bouncy, Button, Field, Glyph, IconButton, IconSelect, ItemList, Section, Segmented, ShapePicker, spring, Switch } from "./ui";
@@ -123,45 +123,62 @@ function Projects({ c, set, t, d }: Props) {
         </Section>
       )}
       <Section title={t.blocks.projects}>
-        <div className="repo-list">
-          {list.map((r, i) => {
-            const o = pr.overrides[r.name] ?? {};
-            const v = projectView(c, r, i);
-            const setO = (x: Partial<typeof o>) => up({ overrides: { ...pr.overrides, [r.name]: { ...o, ...x } } });
-            const isOpen = open === r.name;
-            return (
-              <motion.div key={r.name} layout className={`repo${isOpen ? " open" : ""}`} transition={spring}>
-                <button type="button" className="repo-head" onClick={() => setOpen(isOpen ? null : r.name)}>
-                  <span className="repo-icon"><Glyph name={v.icon} size={20} /></span>
-                  <span className="repo-name">{r.name}</span>
-                  <motion.span animate={{ rotate: isOpen ? 180 : 0 }} transition={bouncy} className="repo-chev">
-                    <Glyph name="keyboard_arrow_down" size={22} />
-                  </motion.span>
-                </button>
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div className="repo-body" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={spring}>
-                      <Field label={t.description} value={o.text ?? ""} placeholder={r.text || c.projects.empty} onChange={(text) => setO({ text })} multiline maxLength={120} />
-                      <div className="inline">
-                        <span className="field-label">{t.icon}</span>
-                        <IconSelect value={o.icon} onChange={(icon) => setO({ icon })} t={t} />
-                        {o.icon && <Button kind="text" onClick={() => setO({ icon: undefined })}>{t.auto}</Button>}
-                      </div>
-                      <span className="field-label">{t.shape}</span>
-                      <ShapePicker value={o.shape} onChange={(shape) => setO({ shape })} allowAuto autoLabel={t.auto} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </div>
+        <p className="note">{t.reorderNote}</p>
+        <Reorder.Group
+          axis="y"
+          as="div"
+          className="repo-list"
+          values={list.map((r) => r.name)}
+          onReorder={(repos: string[]) => up({ source: "manual", repos })}
+        >
+          {list.map((r, i) => (
+            <RepoRow key={r.name} repo={r} index={i} c={c} t={t} open={open === r.name} onToggle={() => setOpen(open === r.name ? null : r.name)} up={up} />
+          ))}
+        </Reorder.Group>
       </Section>
       <Section>
         <Field label={t.emptyText} value={pr.empty} onChange={(empty) => up({ empty })} maxLength={60} />
         <Field label={t.forkLabel} value={pr.fork} onChange={(fork) => up({ fork })} maxLength={12} />
       </Section>
     </>
+  );
+}
+
+function RepoRow({ repo: r, index, c, t, open, onToggle, up }: { repo: Repo; index: number; c: Config; t: Dict; open: boolean; onToggle: () => void; up: (v: Partial<Config["projects"]>) => void }) {
+  const controls = useDragControls();
+  const pr = c.projects;
+  const o = pr.overrides[r.name] ?? {};
+  const v = projectView(c, r, index);
+  const setO = (x: Partial<typeof o>) => up({ overrides: { ...pr.overrides, [r.name]: { ...o, ...x } } });
+  return (
+    <Reorder.Item value={r.name} as="div" className={`repo${open ? " open" : ""}`} dragListener={false} dragControls={controls} transition={spring} whileDrag={{ scale: 1.03, zIndex: 5 }}>
+      <div className="repo-head">
+        <span className="grip" onPointerDown={(e) => controls.start(e)} title={t.move}>
+          <Glyph name="drag_indicator" size={20} />
+        </span>
+        <button type="button" className="repo-open" onClick={onToggle}>
+          <span className="repo-icon"><Glyph name={v.icon} size={20} /></span>
+          <span className="repo-name">{r.name}</span>
+          <motion.span animate={{ rotate: open ? 180 : 0 }} transition={bouncy} className="repo-chev">
+            <Glyph name="keyboard_arrow_down" size={22} />
+          </motion.span>
+        </button>
+      </div>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div className="repo-body" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={spring}>
+            <Field label={t.description} value={o.text ?? ""} placeholder={r.text || c.projects.empty} onChange={(text) => setO({ text })} multiline maxLength={120} />
+            <div className="inline">
+              <span className="field-label">{t.icon}</span>
+              <IconSelect value={o.icon} onChange={(icon) => setO({ icon })} t={t} />
+              {o.icon && <Button kind="text" onClick={() => setO({ icon: undefined })}>{t.auto}</Button>}
+            </div>
+            <span className="field-label">{t.shape}</span>
+            <ShapePicker value={o.shape} onChange={(shape) => setO({ shape })} allowAuto autoLabel={t.auto} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Reorder.Item>
   );
 }
 

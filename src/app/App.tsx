@@ -167,6 +167,7 @@ export default function App() {
   const dark = useDark(theme);
   const wide = useWide();
   const [data, setData] = useState<Data>(DEMO);
+  const [exact, setExact] = useState(false);
   const [avatar, setAvatar] = useState<string | null>(null);
   const [avatarSeed, setAvatarSeed] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -215,6 +216,7 @@ export default function App() {
         const r = await loadProfile(name);
         if (r.stale) setToast(t.stale);
         setData(r.data);
+        setExact(!!r.exact);
         setAvatar(r.avatar);
         setInput(name);
         setConfig((c) => ({ ...c, login: name }));
@@ -410,7 +412,7 @@ export default function App() {
           {(isDemo || data !== DEMO) && (
             <motion.div key={isDemo ? "demo" : "live"} className="banner" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={spring}>
               <Glyph name="info" size={20} />
-              <span>{isDemo ? t.demo : t.preview}</span>
+              <span>{isDemo ? t.demo : exact ? t.previewExact : t.preview}</span>
             </motion.div>
           )}
         </AnimatePresence>
