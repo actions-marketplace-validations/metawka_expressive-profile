@@ -4,6 +4,8 @@ Generator of GitHub profile READMEs in the Material 3 Expressive style. The prof
 
 **Generator:** https://metawka.github.io/expressive-profile/
 
+<p align="center"><img src="docs/editor.png" alt="Editor with the header settings open" width="100%"></p>
+
 ## Features
 
 - Blocks: header, socials, about, tech stack, project cards, activity, streak, divider, link buttons.
@@ -15,11 +17,40 @@ Generator of GitHub profile READMEs in the Material 3 Expressive style. The prof
 - Templates, a shareable link to a setup and a "make one like this" page for any profile built with the generator.
 - English and Russian interface.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/style.png" alt="Style settings"></td>
+    <td width="50%"><img src="docs/projects.png" alt="Project cards"></td>
+  </tr>
+  <tr>
+    <td align="center">Templates, main color and palette styles</td>
+    <td align="center">Project cards from pinned or chosen repositories</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/activity.png" alt="Activity and streak"></td>
+    <td width="50%"><img src="docs/setup.png" alt="Profile setup"></td>
+  </tr>
+  <tr>
+    <td align="center">Activity, streak and link buttons</td>
+    <td align="center">Install to GitHub or download an archive</td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/remix.png" alt="Make one like this page"></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">The "Made with Expressive Profile" link under a profile opens a page with its setup</td>
+  </tr>
+</table>
+
 ## Usage
 
 1. Open the [generator](https://metawka.github.io/expressive-profile/) and enter a GitHub username.
 2. Set up the blocks and press **Download**.
 3. **Install to GitHub** signs in with a GitHub code, creates the profile repository and uploads the files.
+
+https://github.com/user-attachments/assets/ad14524b-1529-4637-8612-7cb41c5eee35
 
 Manual setup: **Download archive** gives a ZIP for a public repository named exactly like the username. All files from it are uploaded to that repository, including the `.github` and `.profile` folders.
 
