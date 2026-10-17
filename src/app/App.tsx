@@ -4,7 +4,8 @@ import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, ty
 import { projectList } from "../render/blocks";
 import { deflateSync, inflateSync, strFromU8, strToU8 } from "fflate";
 import { BLOCKS, defaults, palette, render, REPO_URL, slug, usedIcons, type BlockId, type Config, type Data, type Lang, type ShapeName } from "../render";
-import { buildZip, DEMO, hasIcon, LoadError, loadAllIcons, loadProfile, store } from "./data";
+import { buildZip, DEMO, hasIcon, LoadError, loadAllIcons, loadProfile, profileFiles, store } from "./data";
+import { existingReadme, install, InstallError, requestCode, waitForToken, whoami, type DeviceCode } from "./install";
 import { SheetBody, type SheetId } from "./editors";
 import { DICTS, type Dict } from "./i18n";
 import { bouncy, Button, Glyph, IconButton, Morph, spring, useCycle } from "./ui";
@@ -324,7 +325,6 @@ export default function App() {
       field.current?.focus();
       return;
     }
-    await buildZip(config, data, avatar);
     setDialog(true);
   };
 
@@ -460,7 +460,18 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>{dialog && <DownloadDialog t={t} login={config.login} onClose={() => setDialog(false)} onAgain={() => buildZip(config, data, avatar)} />}</AnimatePresence>
+      <AnimatePresence>
+        {dialog && (
+          <GetDialog
+            t={t}
+            config={config}
+            data={data}
+            avatar={avatar}
+            onLogin={(login) => setConfig((c) => ({ ...c, login }))}
+            onClose={() => setDialog(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {toast && (
@@ -579,36 +590,186 @@ function Sheet({ title, children, onClose, wide, t }: { title: string; children:
   );
 }
 
-function DownloadDialog({ t, login, onClose, onAgain }: { t: Dict; login: string; onClose: () => void; onAgain: () => void }) {
+type Phase = "choose" | "zip" | "code" | "confirm" | "work" | "done" | "error";
+
+function GetDialog({ t, config, data, avatar, onLogin, onClose }: { t: Dict; config: Config; data: Data; avatar: string | null; onLogin: (l: string) => void; onClose: () => void }) {
+  const [phase, setPhase] = useState<Phase>("choose");
+  const [code, setCode] = useState<DeviceCode | null>(null);
+  const [step, setStep] = useState(0);
+  const [error, setError] = useState("");
+  const [login, setLogin] = useState(config.login);
+  const token = useRef("");
+  const abort = useRef(new AbortController());
+  useEffect(() => () => abort.current.abort(), []);
+
+  const fail = (e: unknown) => {
+    const key = e instanceof InstallError ? e.message : "auth";
+    if (key === "cancel") return;
+    setError((t.installErrors as Record<string, string>)[key] ?? t.installErrors.auth);
+    setPhase("error");
+  };
+
+  const upload = async (who: string) => {
+    setPhase("work");
+    const c = { ...config, login: who };
+    await install(token.current, who, profileFiles(c, data, avatar), setStep);
+    setPhase("done");
+  };
+
+  const start = async () => {
+    try {
+      abort.current = new AbortController();
+      const dc = await requestCode();
+      setCode(dc);
+      setPhase("code");
+      navigator.clipboard?.writeText(dc.user_code).catch(() => {});
+      token.current = await waitForToken(dc, abort.current.signal);
+      const who = await whoami(token.current);
+      setLogin(who);
+      if (who !== config.login) onLogin(who);
+      if (await existingReadme(token.current, who)) setPhase("confirm");
+      else await upload(who);
+    } catch (e) {
+      fail(e);
+    }
+  };
+
+  const zip = async () => {
+    await buildZip(config, data, avatar);
+    setPhase("zip");
+  };
+
+  const panel = (key: string, body: ReactNode) => (
+    <motion.div key={key} className="get-panel" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={spring}>
+      {body}
+    </motion.div>
+  );
+
+  let content: ReactNode;
+  if (phase === "choose") {
+    content = panel("choose", (
+      <>
+        <div className="dialog-hero">
+          <Morph shape="sunny" size={64} spin />
+          <h2>{t.getTitle}</h2>
+        </div>
+        <div className="get-options">
+          <motion.button type="button" className="get-option main" onClick={start} whileTap={{ scale: 0.97 }} transition={bouncy}>
+            <Glyph name="rocket_launch" size={28} />
+            <span className="get-option-title">{t.optInstall}</span>
+            <span className="get-option-text">{t.optInstallText}</span>
+          </motion.button>
+          <motion.button type="button" className="get-option" onClick={zip} whileTap={{ scale: 0.97 }} transition={bouncy}>
+            <Glyph name="download" size={28} />
+            <span className="get-option-title">{t.optZip}</span>
+            <span className="get-option-text">{t.optZipText}</span>
+          </motion.button>
+        </div>
+      </>
+    ));
+  } else if (phase === "zip") {
+    content = panel("zip", <ZipSteps t={t} login={config.login} onAgain={() => buildZip(config, data, avatar)} />);
+  } else if (phase === "code") {
+    content = panel("code", (
+      <div className="get-center">
+        <h2>{t.codeTitle}</h2>
+        <p>{t.codeText}</p>
+        <button type="button" className="user-code" onClick={() => code && navigator.clipboard?.writeText(code.user_code)} title={t.copy}>
+          {code?.user_code}
+          <Glyph name="content_copy" size={22} />
+        </button>
+        <Button icon="open_in_new" href={code?.verification_uri}>{t.openGithub}</Button>
+        <div className="get-wait"><Loader /> {t.waiting}</div>
+      </div>
+    ));
+  } else if (phase === "confirm") {
+    content = panel("confirm", (
+      <div className="get-center">
+        <Glyph name="info" size={40} className="get-icon" />
+        <h2>{t.replaceTitle}</h2>
+        <p>{t.replaceText.replace("{repo}", `${login}/${login}`)}</p>
+        <div className="dialog-actions">
+          <Button kind="text" onClick={onClose}>{t.cancel}</Button>
+          <Button onClick={() => upload(login).catch(fail)}>{t.replace}</Button>
+        </div>
+      </div>
+    ));
+  } else if (phase === "work") {
+    content = panel("work", (
+      <div className="get-center">
+        <h2>{t.installing}</h2>
+        <ol className="work-steps">
+          {t.workSteps.map((label, i) => (
+            <li key={label} className={i < step ? "done" : i === step ? "now" : ""}>
+              <span className="work-mark">{i < step ? <Glyph name="check" size={18} /> : i === step ? <Loader /> : null}</span>
+              {label}
+            </li>
+          ))}
+        </ol>
+      </div>
+    ));
+  } else if (phase === "done") {
+    content = panel("done", (
+      <div className="get-center">
+        <Morph shape="flower" size={72} spin className="get-icon" />
+        <h2>{t.doneTitle}</h2>
+        <p>{t.doneText}</p>
+        <div className="dialog-actions center">
+          <Button kind="tonal" icon="monitoring" href={`https://github.com/${login}/${login}/actions`}>{t.openActions}</Button>
+          <Button icon="person" href={`https://github.com/${login}`}>{t.openProfile}</Button>
+        </div>
+      </div>
+    ));
+  } else {
+    content = panel("error", (
+      <div className="get-center">
+        <Glyph name="info" size={40} className="get-icon" />
+        <h2>{error}</h2>
+        <div className="dialog-actions center">
+          <Button kind="text" onClick={() => setPhase("choose")}>{t.back}</Button>
+          <Button icon="restart_alt" onClick={start}>{t.retry}</Button>
+        </div>
+      </div>
+    ));
+  }
+
+  return (
+    <motion.div className="scrim" onClick={phase === "work" ? undefined : onClose} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <motion.div className="dialog get" layout onClick={(e) => e.stopPropagation()} initial={{ opacity: 0, scale: 0.88, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.94 }} transition={spring}>
+        {phase !== "work" && <div className="get-close"><IconButton icon="close" title={t.close} onClick={onClose} /></div>}
+        <AnimatePresence mode="wait" initial={false}>{content}</AnimatePresence>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function ZipSteps({ t, login, onAgain }: { t: Dict; login: string; onAgain: () => void }) {
   const steps: [string, ReactNode][] = [
     [t.dl1, <Button kind="tonal" icon="add" href={`https://github.com/new?name=${encodeURIComponent(login)}&visibility=public`}>{t.dl1Btn}</Button>],
     [t.dl2, <><Button kind="tonal" icon="upload" href={`https://github.com/${login}/${login}/upload/main`}>{t.dl2Btn}</Button><p className="note">{t.dl2Mac}</p></>],
     [t.dl3, null],
   ];
   return (
-    <motion.div className="scrim" onClick={onClose} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      <motion.div className="dialog" onClick={(e) => e.stopPropagation()} initial={{ opacity: 0, scale: 0.88, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.94 }} transition={spring}>
-        <div className="dialog-hero">
-          <Morph shape="sunny" size={64} spin />
-          <h2>{t.dlTitle}</h2>
-        </div>
-        <ol className="steps">
-          {steps.map(([text, extra], i) => (
-            <motion.li key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ ...spring, delay: 0.1 + i * 0.08 }}>
-              <span className="step-num">{i + 1}</span>
-              <div className="step-body">
-                <p>{text}</p>
-                {extra}
-              </div>
-            </motion.li>
-          ))}
-        </ol>
-        <div className="dialog-actions">
-          <Button kind="text" icon="download" onClick={onAgain}>{t.dlAgain}</Button>
-          <Button onClick={onClose}>OK</Button>
-        </div>
-      </motion.div>
-    </motion.div>
+    <>
+      <div className="dialog-hero">
+        <Morph shape="sunny" size={64} spin />
+        <h2>{t.dlTitle}</h2>
+      </div>
+      <ol className="steps">
+        {steps.map(([text, extra], i) => (
+          <motion.li key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ ...spring, delay: 0.1 + i * 0.08 }}>
+            <span className="step-num">{i + 1}</span>
+            <div className="step-body">
+              <p>{text}</p>
+              {extra}
+            </div>
+          </motion.li>
+        ))}
+      </ol>
+      <div className="dialog-actions">
+        <Button kind="text" icon="download" onClick={onAgain}>{t.dlAgain}</Button>
+      </div>
+    </>
   );
 }
 

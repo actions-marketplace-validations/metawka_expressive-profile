@@ -1314,3 +1314,161 @@ a {
   gap: 0;
   flex-wrap: nowrap;
 }
+
+/* Get */
+.dialog.get {
+  position: relative;
+  overflow: hidden;
+}
+
+.get-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+}
+
+.get-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.get-options {
+  display: grid;
+  gap: 10px;
+}
+
+.get-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 16px;
+  row-gap: 4px;
+  align-items: center;
+  padding: 18px 20px;
+  border-radius: 24px;
+  background: var(--surface-container);
+  text-align: left;
+  transition: border-radius .35s var(--ease), background-color .25s var(--ease);
+}
+
+.get-option:hover {
+  border-radius: 32px;
+}
+
+.get-option svg {
+  grid-row: span 2;
+  color: var(--primary);
+}
+
+.get-option.main {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.get-option.main svg {
+  color: inherit;
+}
+
+.get-option-title {
+  font-weight: 650;
+  font-size: 17px;
+}
+
+.get-option-text {
+  font-size: 14px;
+  line-height: 1.45;
+  opacity: .8;
+}
+
+.get-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 4px 4px;
+  text-align: center;
+}
+
+.get-center h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.get-center p {
+  margin: 0;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+}
+
+.get-icon {
+  color: var(--primary);
+}
+
+.user-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 24px;
+  border-radius: 24px;
+  background: var(--surface-container-highest);
+  font: 700 32px ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .12em;
+  color: var(--on-surface);
+}
+
+.user-code svg {
+  color: var(--on-surface-variant);
+}
+
+.get-wait {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--on-surface-variant);
+  font-size: 14px;
+}
+
+.work-steps {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-self: stretch;
+}
+
+.work-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+  font-weight: 500;
+}
+
+.work-steps li.now {
+  background: var(--secondary-container);
+  color: var(--on-secondary-container);
+}
+
+.work-steps li.done {
+  color: var(--on-surface);
+}
+
+.work-mark {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  color: var(--primary);
+}
+
+.dialog-actions.center {
+  justify-content: center;
+  flex-wrap: wrap;
+}

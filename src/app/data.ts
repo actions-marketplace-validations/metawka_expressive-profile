@@ -231,14 +231,19 @@ jobs:
           token: \${{ secrets.PROFILE_TOKEN || github.token }}
 `;
 
+export function profileFiles(c: Config, d: Data, avatar: string | null) {
+  const svgs = render(c, d, store, avatar);
+  const files: Record<string, string> = { ...svgs };
+  files["README.md"] = readme(c, d, svgs);
+  files["profile.json"] = JSON.stringify(c, null, 2) + "\n";
+  files[".profile/icons.json"] = JSON.stringify(pickIcons(store, usedIcons(c, d)));
+  files[".github/workflows/expressive-profile.yml"] = WORKFLOW;
+  return files;
+}
+
 export async function buildZip(c: Config, d: Data, avatar: string | null) {
   const files: Record<string, Uint8Array> = {};
-  const svgs = render(c, d, store, avatar);
-  for (const [path, svg] of Object.entries(svgs)) files[path] = strToU8(svg);
-  files["README.md"] = strToU8(readme(c, d, svgs));
-  files["profile.json"] = strToU8(JSON.stringify(c, null, 2) + "\n");
-  files[".profile/icons.json"] = strToU8(JSON.stringify(pickIcons(store, usedIcons(c, d))));
-  files[".github/workflows/expressive-profile.yml"] = strToU8(WORKFLOW);
+  for (const [path, text] of Object.entries(profileFiles(c, d, avatar))) files[path] = strToU8(text);
   const zip = zipSync(files, { level: 9 });
   const url = URL.createObjectURL(new Blob([zip], { type: "application/zip" }));
   const a = document.createElement("a");
