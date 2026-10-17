@@ -1,6 +1,6 @@
 # Expressive Profile
 
-Generator of GitHub profile READMEs in the Material 3 Expressive style. You set up the profile on the site, download an archive and upload it to your profile repository. After that a GitHub Action refreshes the stats every day.
+Generator of GitHub profile READMEs in the Material 3 Expressive style. The profile is set up on the site and installed into the profile repository. A GitHub Action then refreshes the stats every day.
 
 **Generator:** https://metawka.github.io/expressive-profile/
 
@@ -17,15 +17,15 @@ Generator of GitHub profile READMEs in the Material 3 Expressive style. You set 
 
 ## Usage
 
-1. Open the [generator](https://metawka.github.io/expressive-profile/) and enter your GitHub username.
+1. Open the [generator](https://metawka.github.io/expressive-profile/) and enter a GitHub username.
 2. Set up the blocks and press **Download**.
-3. Choose **Install to GitHub**, sign in with the code shown on the site, and the generator creates the profile repository and uploads the files.
+3. **Install to GitHub** signs in with a GitHub code, creates the profile repository and uploads the files.
 
-Manual setup is also available: choose **Download archive**, create a public repository named exactly like your username and upload all files from the archive, including the `.github` and `.profile` folders.
+Manual setup: **Download archive** gives a ZIP for a public repository named exactly like the username. All files from it are uploaded to that repository, including the `.github` and `.profile` folders.
 
 Signing in uses the GitHub device flow with the `public_repo` and `workflow` scopes. The token stays in the browser tab and is used only for this upload. If the repository already has a README, the generator asks before replacing it.
 
-The first workflow run replaces the preview data with exact stats and your pinned repositories. Then the profile updates once a day and commits only when something changed.
+The first workflow run replaces the preview data with exact stats and pinned repositories. Then the profile updates once a day and commits only when something changed.
 
 To change the profile later, edit `profile.json` in the repository or set it up again on the site and upload the new `profile.json`.
 
@@ -63,7 +63,7 @@ jobs:
 | `token` | `github.token` | Token for the GitHub API |
 | `commit-message` | `Updated profile` | Message of update commits |
 
-With the default token the language chart counts public repositories only. To include private ones, create a personal access token with read access to your repositories and save it as the `PROFILE_TOKEN` secret.
+With the default token the language chart counts public repositories only. Private repositories are counted with a personal access token saved as the `PROFILE_TOKEN` secret.
 
 ## Development
 
