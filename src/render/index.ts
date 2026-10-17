@@ -18,6 +18,7 @@ export function defaults(login: string, lang: Lang): Config {
     seed: "#FF5CA8",
     scheme: "tonalSpot",
     motion: true,
+    iconFill: true,
     order: [...BLOCKS],
     hidden: [],
     hero: {
@@ -132,12 +133,28 @@ export function pickIcons(all: Icons, names: string[]): Icons {
     if (n.startsWith("brand:")) {
       const b = all.brand[n.slice(6)];
       if (b) out.brand[n.slice(6)] = { t: b.t, d: b.d, c: b.c };
-    } else if (all.symbol[n]) out.symbol[n] = all.symbol[n];
+    } else {
+      if (all.symbol[n]) out.symbol[n] = all.symbol[n];
+      if (all.symbol[n + "#fill"]) out.symbol[n + "#fill"] = all.symbol[n + "#fill"];
+    }
   }
   return out;
 }
 
-export function render(c: Config, d: Data, icons: Icons, avatar: string | null, themes: ("light" | "dark")[] = ["light", "dark"]) {
+const filled = new WeakMap<Icons, Icons>();
+
+export function withFill(icons: Icons): Icons {
+  let hit = filled.get(icons);
+  if (hit && Object.keys(hit.symbol).length === Object.keys(icons.symbol).length) return hit;
+  const symbol = { ...icons.symbol };
+  for (const [k, v] of Object.entries(icons.symbol)) if (k.endsWith("#fill")) symbol[k.slice(0, -5)] = v;
+  hit = { brand: icons.brand, symbol };
+  filled.set(icons, hit);
+  return hit;
+}
+
+export function render(c: Config, d: Data, all: Icons, avatar: string | null, themes: ("light" | "dark")[] = ["light", "dark"]) {
+  const icons = c.iconFill === false ? all : withFill(all);
   const files: Record<string, string> = {};
   const repos = projectList(c, d);
   for (const theme of themes) {

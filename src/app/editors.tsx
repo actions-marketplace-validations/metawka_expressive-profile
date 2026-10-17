@@ -334,6 +334,7 @@ function Style({ c, set, t, avatarSeed, onReset, onImage }: Props & { avatarSeed
         </div>
       </Section>
       <Section>
+        <Switch label={t.iconFill} value={c.iconFill !== false} onChange={(iconFill) => set((c) => ({ ...c, iconFill }))} />
         <Switch label={t.motion} value={c.motion} onChange={(motion) => set((c) => ({ ...c, motion }))} />
       </Section>
       <Section>

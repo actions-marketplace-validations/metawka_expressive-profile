@@ -30,6 +30,7 @@ export interface Config {
   seed: string;
   scheme: SchemeName;
   motion: boolean;
+  iconFill?: boolean;
   order: BlockId[];
   hidden: BlockId[];
   hero: {

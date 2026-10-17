@@ -196,7 +196,7 @@ function IconPicker({ onPick, onClose, t, prefer }: { onPick: (v: string) => voi
         .map(([k, v]) => ["brand:" + k, v.t] as const);
     }
     return Object.keys(store.symbol)
-      .filter((k) => !query || k.includes(query))
+      .filter((k) => !k.endsWith("#fill") && (!query || k.includes(query)))
       .slice(0, 180)
       .map((k) => [k, k.replace(/_/g, " ")] as const);
   }, [tab, q, ready]);

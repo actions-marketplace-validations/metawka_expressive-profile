@@ -24,10 +24,11 @@ copyFileSync(join(root, "fonts/RobotoFlex-cyrillic.woff2"), join(pub, "rf-cyr.wo
 // Symbols
 const symbols = {};
 for (const f of readdirSync(symDir)) {
-  if (!f.endsWith(".svg") || f.endsWith("-fill.svg")) continue;
+  if (!f.endsWith(".svg")) continue;
   const svg = readFileSync(join(symDir, f), "utf8");
   const ds = [...svg.matchAll(/ d="([^"]+)"/g)].map((m) => m[1]);
-  symbols[f.slice(0, -4)] = ds.join(" ");
+  const name = f.endsWith("-fill.svg") ? f.slice(0, -9) + "#fill" : f.slice(0, -4);
+  symbols[name] = ds.join(" ");
 }
 writeFileSync(join(pub, "symbols.json"), JSON.stringify(symbols));
 
@@ -55,7 +56,11 @@ const coreBrands = [
   "x", "youtube", "twitch", "spotify", "vercel", "supabase", "unity", "godotengine", "blender", "instagram", "tiktok", "vk", "bluesky", "mastodon", "reddit", "steam", "boosty", "patreon", "kofi", "buymeacoffee", "devdotto", "medium", "habr", "leetcode", "codepen", "dribbble", "behance", "threads", "pinterest", "whatsapp", "signal", "gmail", "protonmail", "linktree", "itchdotio", "artstation", "soundcloud", "yandexcloud",
 ];
 const core = { symbol: {}, brand: {} };
-for (const n of coreSymbols) if (symbols[n]) core.symbol[n] = symbols[n]; else console.warn("no symbol", n);
+for (const n of coreSymbols) {
+  if (symbols[n]) core.symbol[n] = symbols[n];
+  else console.warn("no symbol", n);
+  if (symbols[n + "#fill"]) core.symbol[n + "#fill"] = symbols[n + "#fill"];
+}
 for (const n of coreBrands) if (brands[n]) core.brand[n] = brands[n]; else console.warn("no brand", n);
 writeFileSync(join(src, "core-icons.json"), JSON.stringify(core));
 
