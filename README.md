@@ -10,6 +10,8 @@ Generator of GitHub profile READMEs in the Material 3 Expressive style. The prof
   <a href="https://github.com/marketplace/actions/expressive-profile">GitHub Marketplace</a>
 </p>
 
+<p align="center"><a href="https://github.com/metawka/expressive-profile/stargazers"><picture><source media="(prefers-color-scheme: dark)" srcset="docs/star-dark.svg"><img src="docs/star-light.svg" width="640" alt="Star Expressive Profile on GitHub"></picture></a></p>
+
 <div align="center">
 
 <a href="https://github.com/metawka"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/metawka/metawka/main/assets/hero-dark.svg"><img src="https://raw.githubusercontent.com/metawka/metawka/main/assets/hero-light.svg" width="100%" alt="Profile header"></picture></a>
