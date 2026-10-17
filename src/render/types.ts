@@ -1,0 +1,107 @@
+export type BlockId = "hero" | "about" | "stack" | "projects" | "stats" | "streak" | "socials" | "wave" | "buttons";
+export type ShapeName = "cookie" | "cookie12" | "clover" | "sunny" | "flower" | "pill" | "soft" | "gem";
+export type SchemeName = "tonalSpot" | "vibrant" | "expressive" | "fidelity" | "monochrome";
+export type Lang = "en" | "ru";
+
+export interface Item {
+  icon: string;
+  label: string;
+}
+
+export interface LinkButton extends Item {
+  url: string;
+  style: "filled" | "tonal";
+}
+
+export interface Social {
+  icon: string;
+  url: string;
+}
+
+export interface Override {
+  text?: string;
+  icon?: string;
+  shape?: ShapeName;
+}
+
+export interface Config {
+  version: 1;
+  login: string;
+  seed: string;
+  scheme: SchemeName;
+  motion: boolean;
+  order: BlockId[];
+  hidden: BlockId[];
+  hero: {
+    greeting: string;
+    name: string;
+    subtitle: string;
+    typing: boolean;
+    avatarShape: ShapeName;
+    chips: Item[];
+  };
+  about: { title: string; items: Item[] };
+  stack: { title: string; groups: { title: string; items: Item[] }[] };
+  projects: {
+    source: "pinned" | "manual";
+    repos: string[];
+    overrides: Record<string, Override>;
+    empty: string;
+    fork: string;
+  };
+  stats: {
+    title: string;
+    stars: string;
+    contributions: string;
+    repos: string;
+    followers: string;
+    calendar: string;
+    weekdays: string;
+    languages: string;
+    showLanguages: boolean;
+  };
+  streak: { title: string; current: string; longest: string; days: string };
+  socials: {
+    items: Social[];
+    variant: "icon" | "chip";
+    fill: "tonal" | "filled" | "outlined" | "brand";
+    shape?: ShapeName;
+    card?: boolean;
+  };
+  buttons: { items: LinkButton[]; card?: boolean };
+}
+
+export interface Repo {
+  name: string;
+  url: string;
+  text: string;
+  fork: boolean;
+  stars: number;
+  language: string | null;
+  topics: string[];
+}
+
+export interface Day {
+  c: number;
+  day: number;
+  today?: boolean;
+}
+
+export interface Data {
+  stars: number;
+  contributions: number;
+  repos: number;
+  followers: number;
+  languages: [string, number][];
+  days: (Day | null)[][];
+  streak: { current: number; longest: number };
+  pins: Repo[];
+  all: Repo[];
+}
+
+export interface Icons {
+  symbol: Record<string, string>;
+  brand: Record<string, { t: string; d: string; c?: string }>;
+}
+
+export type Palette = Record<string, string>;

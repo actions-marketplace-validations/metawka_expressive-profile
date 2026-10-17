@@ -1,0 +1,9 @@
+node_modules
+/dist
+/public/symbols.json
+/public/brands.json
+/public/gsf.woff2
+/public/rf-cyr.woff2
+/src/render/fontdata.ts
+/src/render/core-icons.json
+.project-status.md

@@ -1,0 +1,32 @@
+name: Expressive Profile
+description: Material 3 Expressive profile README for GitHub that updates itself
+author: metawka
+branding:
+  icon: user
+  color: purple
+
+inputs:
+  token:
+    description: Token for the GitHub API. A personal token also counts languages of private repositories
+    default: ${{ github.token }}
+  commit-message:
+    description: Commit message for updates
+    default: Updated profile
+
+runs:
+  using: composite
+  steps:
+    - name: Render
+      shell: bash
+      run: node "$GITHUB_ACTION_PATH/action/render.mjs"
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+    - name: Commit
+      shell: bash
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add -A assets README.md .profile
+        git diff --cached --quiet || (git commit -m "$MESSAGE" && git push)
+      env:
+        MESSAGE: ${{ inputs.commit-message }}

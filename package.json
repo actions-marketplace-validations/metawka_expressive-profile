@@ -1,0 +1,30 @@
+{
+  "name": "expressive-profile",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "assets": "node scripts/assets.mjs",
+    "renderer": "node scripts/renderer.mjs",
+    "dev": "npm run assets && vite",
+    "build": "npm run assets && npm run renderer && tsc && vite build"
+  },
+  "dependencies": {
+    "@material/material-color-utilities": "^0.4.0",
+    "fflate": "^0.8.3",
+    "motion": "^14.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@material-symbols/svg-400": "^0.48.0",
+    "@types/node": "^26.6.5",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^6.1.2",
+    "esbuild": "^0.28.2",
+    "simple-icons": "^16.35.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  }
+}
