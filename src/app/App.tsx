@@ -32,8 +32,7 @@ function write(key: string, v: unknown) {
 
 function initialLang(): Lang {
   const saved = read<Lang | null>("ep:lang", null);
-  if (saved) return saved;
-  return navigator.language.toLowerCase().startsWith("ru") ? "ru" : "en";
+  return saved ?? "en";
 }
 
 function migrate(c: Config | null, lang: Lang): Config {
@@ -105,6 +104,7 @@ function remixFrom(theirs: Config, lang: Lang, login: string): Config {
   return {
     ...base,
     seed: theirs.seed ?? base.seed,
+    seedFromAvatar: false,
     scheme: theirs.scheme ?? base.scheme,
     motion: theirs.motion ?? base.motion,
     order: theirs.order ?? base.order,
@@ -254,7 +254,7 @@ export default function App() {
       img.src = url;
       await img.decode();
       const argb = await sourceColorFromImage(img);
-      setConfig((c) => ({ ...c, seed: hexFromArgb(argb).toUpperCase() }));
+      setConfig((c) => ({ ...c, seed: hexFromArgb(argb).toUpperCase(), seedFromAvatar: false }));
     } catch {
       setToast(t.failed);
     } finally {
@@ -278,6 +278,10 @@ export default function App() {
     img.src = avatar;
     img.decode().then(() => sourceColorFromImage(img)).then((argb) => setAvatarSeed(hexFromArgb(argb).toUpperCase())).catch(() => setAvatarSeed(null));
   }, [avatar]);
+
+  useEffect(() => {
+    if (avatarSeed && config.seedFromAvatar && config.seed !== avatarSeed) setConfig((c) => ({ ...c, seed: avatarSeed }));
+  }, [avatarSeed, config.seedFromAvatar]);
 
   useEffect(() => {
     const on = (e: KeyboardEvent) => {

@@ -28,6 +28,7 @@ export interface Config {
   version: 1;
   login: string;
   seed: string;
+  seedFromAvatar?: boolean;
   scheme: SchemeName;
   motion: boolean;
   iconFill?: boolean;

@@ -16,6 +16,7 @@ export function defaults(login: string, lang: Lang): Config {
     version: 1,
     login,
     seed: "#FF5CA8",
+    seedFromAvatar: true,
     scheme: "tonalSpot",
     motion: true,
     iconFill: true,
@@ -77,8 +78,9 @@ export function defaults(login: string, lang: Lang): Config {
         { icon: "brand:discord", url: "https://discord.com/" },
         { icon: "brand:x", url: "https://x.com/" },
       ],
-      variant: "icon",
+      variant: "chip",
       fill: "tonal",
+      card: true,
     },
     buttons: {
       items: [

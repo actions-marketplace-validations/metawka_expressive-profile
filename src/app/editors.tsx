@@ -302,13 +302,13 @@ function Style({ c, set, t, avatarSeed, onReset, onImage }: Props & { avatarSeed
       <Section title={t.seed}>
         <div className="swatches">
           {SEEDS.map((s) => (
-            <motion.button key={s} type="button" className={`swatch${c.seed.toUpperCase() === s ? " on" : ""}`} style={{ background: s }} onClick={() => set((c) => ({ ...c, seed: s }))} whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.1 }} transition={bouncy} aria-label={s}>
+            <motion.button key={s} type="button" className={`swatch${c.seed.toUpperCase() === s ? " on" : ""}`} style={{ background: s }} onClick={() => set((c) => ({ ...c, seed: s, seedFromAvatar: false }))} whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.1 }} transition={bouncy} aria-label={s}>
               {c.seed.toUpperCase() === s && <Glyph name="check" size={20} />}
             </motion.button>
           ))}
           <label className={`swatch custom${!SEEDS.includes(c.seed.toUpperCase()) ? " on" : ""}`} title={t.custom} style={{ background: c.seed }}>
             <Glyph name="palette" size={20} />
-            <input type="color" value={c.seed} onChange={(e) => set((c) => ({ ...c, seed: e.target.value.toUpperCase() }))} />
+            <input type="color" value={c.seed} onChange={(e) => set((c) => ({ ...c, seed: e.target.value.toUpperCase(), seedFromAvatar: false }))} />
           </label>
         </div>
         <label className="from-avatar file">
@@ -317,7 +317,7 @@ function Style({ c, set, t, avatarSeed, onReset, onImage }: Props & { avatarSeed
           <input type="file" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; if (f) onImage(f); e.target.value = ""; }} />
         </label>
         {avatarSeed && (
-          <button type="button" className={`from-avatar${c.seed.toUpperCase() === avatarSeed ? " on" : ""}`} onClick={() => set((c) => ({ ...c, seed: avatarSeed }))}>
+          <button type="button" className={`from-avatar${c.seedFromAvatar ? " on" : ""}`} onClick={() => set((c) => ({ ...c, seed: avatarSeed, seedFromAvatar: true }))}>
             <span className="dot" style={{ background: avatarSeed }} />
             {t.fromAvatar}
           </button>
