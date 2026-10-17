@@ -19,8 +19,11 @@ Generator of GitHub profile READMEs in the Material 3 Expressive style. You set 
 
 1. Open the [generator](https://metawka.github.io/expressive-profile/) and enter your GitHub username.
 2. Set up the blocks and press **Download**.
-3. Create a public repository named exactly like your username.
-4. Unpack the archive and upload all of its files to the repository, including the `.github` and `.profile` folders.
+3. Choose **Install to GitHub**, sign in with the code shown on the site, and the generator creates the profile repository and uploads the files.
+
+Manual setup is also available: choose **Download archive**, create a public repository named exactly like your username and upload all files from the archive, including the `.github` and `.profile` folders.
+
+Signing in uses the GitHub device flow with the `public_repo` and `workflow` scopes. The token stays in the browser tab and is used only for this upload. If the repository already has a README, the generator asks before replacing it.
 
 The first workflow run replaces the preview data with exact stats and your pinned repositories. Then the profile updates once a day and commits only when something changed.
 
@@ -72,6 +75,8 @@ npm run dev
 ```
 
 `npm run build` builds the site into `dist` and the Action renderer into `action/render.mjs`.
+
+The `proxy` folder contains the sign-in proxy deployed on Vercel. It forwards two device flow requests to GitHub and stores nothing.
 
 ## License
 
