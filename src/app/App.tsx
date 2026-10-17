@@ -304,7 +304,9 @@ export default function App() {
   const files = useMemo(() => render(deferred, data, store, avatar, [dark ? "dark" : "light"]), [deferred, data, avatar, dark, iconsTick]);
   const urls = useBlobUrls(files);
   const src = (name: string) => urls[`assets/${name}-${dark ? "dark" : "light"}.svg`];
-  const width = (name: string) => Number(/width="([\d.]+)"/.exec(files[`assets/${name}-${dark ? "dark" : "light"}.svg`] ?? "")?.[1] ?? 0);
+  const attr = (name: string, key: string) => Number(new RegExp(`${key}="([0-9.]+)"`).exec(files[`assets/${name}-${dark ? "dark" : "light"}.svg`] ?? "")?.[1] ?? 0);
+  const width = (name: string) => attr(name, "width");
+  const ratio = (name: string) => attr(name, "height") / (attr(name, "width") || 1);
   const body = useRef<HTMLDivElement>(null);
   const [k, setK] = useState(1);
   useEffect(() => {
@@ -428,12 +430,12 @@ export default function App() {
           >
             {visible.map((id) => (
               <Block key={id} id={id} t={t} active={sheet === id} onEdit={id === "wave" ? undefined : () => setSheet(id as SheetId)} onHide={() => hide(id)}>
-                <BlockView id={id} config={deferred} data={data} src={src} size={(n) => width(n) * Math.min(1, k)} fill={(n) => width(n) * k} />
+                <BlockView id={id} config={deferred} data={data} src={src} size={(n) => width(n) * Math.min(1, k)} fill={(n) => width(n) * k} ratio={ratio} />
               </Block>
             ))}
           </Reorder.Group>
           <div className="credit">
-            <img draggable={false} src={src("credit")} alt="Made with Expressive Profile" style={{ width: width("credit") * Math.min(1, k) }} />
+            <img draggable={false} src={src("credit")} alt="Made with Expressive Profile" style={{ width: width("credit") * Math.min(1, k), height: width("credit") * Math.min(1, k) * ratio("credit") }} />
           </div>
         </div>
 
@@ -545,30 +547,30 @@ function Block({ id, t, children, active, onEdit, onHide }: { id: BlockId; t: Di
   );
 }
 
-function BlockView({ id, config, data, src, size, fill }: { id: BlockId; config: Config; data: Data; src: (n: string) => string; size: (n: string) => number; fill: (n: string) => number }) {
+function BlockView({ id, config, data, src, size, fill, ratio }: { id: BlockId; config: Config; data: Data; src: (n: string) => string; size: (n: string) => number; fill: (n: string) => number; ratio: (n: string) => number }) {
   if (id === "projects") {
     const repos = projectList(config, data);
     return (
       <div className="cards">
         {repos.map((r) => (
-          <img draggable={false} key={r.name} src={src(`project-${slug(r.name)}`)} alt={r.name} />
+          <img draggable={false} key={r.name} src={src(`project-${slug(r.name)}`)} alt={r.name} style={{ aspectRatio: 1 / (ratio(`project-${slug(r.name)}`) || 1) }} />
         ))}
       </div>
     );
   }
-  if (id === "socials") return <LinkRow prefix="social" count={config.socials.items.length} src={src} size={size} fill={fill} />;
-  if (id === "buttons") return <LinkRow prefix="button" count={config.buttons.items.length} src={src} size={size} fill={fill} />;
-  return <img draggable={false} className="full" src={src(id)} alt={id} />;
+  if (id === "socials") return <LinkRow prefix="social" count={config.socials.items.length} src={src} size={size} fill={fill} ratio={ratio} />;
+  if (id === "buttons") return <LinkRow prefix="button" count={config.buttons.items.length} src={src} size={size} fill={fill} ratio={ratio} />;
+  return <img draggable={false} className="full" src={src(id)} alt={id} style={{ aspectRatio: 1 / (ratio(id) || 1) }} />;
 }
 
-function LinkRow({ prefix, count, src, size, fill }: { prefix: string; count: number; src: (n: string) => string; size: (n: string) => number; fill: (n: string) => number }) {
+function LinkRow({ prefix, count, src, size, fill, ratio }: { prefix: string; count: number; src: (n: string) => string; size: (n: string) => number; fill: (n: string) => number; ratio: (n: string) => number }) {
   const card = !!src(`${prefix}-l`);
   const names = Array.from({ length: count }, (_, i) => `${prefix}-${i + 1}`);
   if (card) names.unshift(`${prefix}-l`), names.push(`${prefix}-r`);
   return (
     <div className={`buttons${card ? " row-card" : ""}`}>
       {names.map((n) => (
-        <img draggable={false} key={n} src={src(n)} alt="" style={{ width: card ? fill(n) : size(n) }} />
+        <img draggable={false} key={n} src={src(n)} alt="" style={{ width: card ? fill(n) : size(n), height: (card ? fill(n) : size(n)) * ratio(n) }} />
       ))}
     </div>
   );
