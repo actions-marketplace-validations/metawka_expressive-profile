@@ -2,9 +2,25 @@
 
 Generator of GitHub profile READMEs in the Material 3 Expressive style. The profile is set up on the site and installed into the profile repository. A GitHub Action then refreshes the stats every day.
 
-**Generator:** https://metawka.github.io/expressive-profile/
+<p align="center">
+  <a href="https://metawka.github.io/expressive-profile/"><b>Open the generator</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/metawka">Live example</a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/marketplace/actions/expressive-profile">GitHub Marketplace</a>
+</p>
 
-<p align="center"><img src="docs/editor.png" alt="Editor with the header settings open" width="100%"></p>
+<div align="center">
+
+<a href="https://github.com/metawka"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/metawka/metawka/main/assets/hero-dark.svg"><img src="https://raw.githubusercontent.com/metawka/metawka/main/assets/hero-light.svg" width="100%" alt="Profile header"></picture></a>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/metawka/metawka/main/assets/stats-dark.svg"><img src="https://raw.githubusercontent.com/metawka/metawka/main/assets/stats-light.svg" width="100%" alt="GitHub activity"></picture>
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/metawka/metawka/main/assets/streak-dark.svg"><img src="https://raw.githubusercontent.com/metawka/metawka/main/assets/streak-light.svg" width="100%" alt="Streak"></picture>
+
+<sub>Live cards from <a href="https://github.com/metawka">github.com/metawka</a>, refreshed daily by the Action. The look follows the GitHub light or dark theme.</sub>
+
+</div>
 
 ## Features
 
@@ -20,6 +36,12 @@ Generator of GitHub profile READMEs in the Material 3 Expressive style. The prof
 ## Screenshots
 
 <table>
+  <tr>
+    <td colspan="2"><img src="docs/editor.png" alt="Editor with the header settings open"></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">Editor: live preview, editing by click, drag to reorder</td>
+  </tr>
   <tr>
     <td width="50%"><img src="docs/style.png" alt="Style settings"></td>
     <td width="50%"><img src="docs/projects.png" alt="Project cards"></td>
@@ -54,11 +76,17 @@ https://github.com/user-attachments/assets/ad14524b-1529-4637-8612-7cb41c5eee35
 
 Manual setup: **Download archive** gives a ZIP for a public repository named exactly like the username. All files from it are uploaded to that repository, including the `.github` and `.profile` folders.
 
-Signing in uses the GitHub device flow with the `public_repo` and `workflow` scopes. The token stays in the browser tab and is used only for this upload. If the repository already has a README, the generator asks before replacing it.
+Signing in uses the GitHub device flow with the `public_repo` and `workflow` scopes. The token stays in the browser tab and is used only for this upload. The sign-in proxy is open source, see [`proxy/`](proxy). If the repository already has a README, the generator asks before replacing it.
 
 The first workflow run replaces the preview data with exact stats and pinned repositories. Then the profile updates once a day and commits only when something changed.
 
 To change the profile later, edit `profile.json` in the repository or set it up again on the site and upload the new `profile.json`.
+
+## Made with Expressive Profile
+
+- [metawka](https://github.com/metawka)
+
+Profiles built with the generator can be added to this list with a pull request.
 
 ## Action
 
