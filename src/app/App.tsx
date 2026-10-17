@@ -407,58 +407,60 @@ export default function App() {
         </div>
       </header>
 
-      <motion.main className="stage" animate={{ paddingRight: shiftForSheet }} transition={spring}>
-        <AnimatePresence initial={false}>
-          {(isDemo || data !== DEMO) && (
-            <motion.div key={isDemo ? "demo" : "live"} className="banner" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={spring}>
-              <Glyph name="info" size={20} />
-              <span>{isDemo ? t.demo : exact ? t.previewExact : t.preview}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <main className="stage">
+        <motion.div className="stage-inner" animate={{ paddingRight: shiftForSheet }} transition={spring}>
+          <AnimatePresence initial={false}>
+            {(isDemo || data !== DEMO) && (
+              <motion.div key={isDemo ? "demo" : "live"} className="banner" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={spring}>
+                <Glyph name="info" size={20} />
+                <span>{isDemo ? t.demo : exact ? t.previewExact : t.preview}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-        <div className={`paper${dark ? " dark" : ""}`}>
-          <div className="paper-head">
-            <Glyph name="book_2" size={16} />
-            <span>{config.login} / README.md</span>
+          <div className={`paper${dark ? " dark" : ""}`}>
+            <div className="paper-head">
+              <Glyph name="book_2" size={16} />
+              <span>{config.login} / README.md</span>
+            </div>
+            <Reorder.Group
+              ref={body}
+              axis="y"
+              as="div"
+              className="paper-body"
+              values={visible}
+              onReorder={(next: BlockId[]) => setConfig((c) => ({ ...c, order: [...next, ...c.order.filter((b) => c.hidden.includes(b))] }))}
+            >
+              {visible.map((id) => (
+                <Block key={id} id={id} t={t} active={sheet === id} onEdit={id === "wave" ? undefined : () => setSheet(id as SheetId)} onHide={() => hide(id)}>
+                  <BlockView id={id} config={deferred} data={data} src={src} size={(n) => width(n) * Math.min(1, k)} fill={(n) => width(n) * k} ratio={ratio} />
+                </Block>
+              ))}
+            </Reorder.Group>
+            <div className="credit">
+              <img draggable={false} src={src("credit")} alt="Made with Expressive Profile" style={{ width: width("credit") * Math.min(1, k), height: width("credit") * Math.min(1, k) * ratio("credit") }} />
+            </div>
           </div>
-          <Reorder.Group
-            ref={body}
-            axis="y"
-            as="div"
-            className="paper-body"
-            values={visible}
-            onReorder={(next: BlockId[]) => setConfig((c) => ({ ...c, order: [...next, ...c.order.filter((b) => c.hidden.includes(b))] }))}
-          >
-            {visible.map((id) => (
-              <Block key={id} id={id} t={t} active={sheet === id} onEdit={id === "wave" ? undefined : () => setSheet(id as SheetId)} onHide={() => hide(id)}>
-                <BlockView id={id} config={deferred} data={data} src={src} size={(n) => width(n) * Math.min(1, k)} fill={(n) => width(n) * k} ratio={ratio} />
-              </Block>
-            ))}
-          </Reorder.Group>
-          <div className="credit">
-            <img draggable={false} src={src("credit")} alt="Made with Expressive Profile" style={{ width: width("credit") * Math.min(1, k), height: width("credit") * Math.min(1, k) * ratio("credit") }} />
-          </div>
-        </div>
 
-        <AnimatePresence>
-          {hidden.length > 0 && (
-            <motion.div className="tray" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} transition={spring}>
-              <span className="tray-title">{t.hidden}</span>
-              <div className="chips-wrap">
-                <AnimatePresence>
-                  {hidden.map((id) => (
-                    <motion.button key={id} type="button" layout className="filter-chip" onClick={() => show(id)} initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.6, opacity: 0 }} whileTap={{ scale: 0.9 }} transition={bouncy}>
-                      <Glyph name="add" size={18} />
-                      {t.blocks[id]}
-                    </motion.button>
-                  ))}
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.main>
+          <AnimatePresence>
+            {hidden.length > 0 && (
+              <motion.div className="tray" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} transition={spring}>
+                <span className="tray-title">{t.hidden}</span>
+                <div className="chips-wrap">
+                  <AnimatePresence>
+                    {hidden.map((id) => (
+                      <motion.button key={id} type="button" layout className="filter-chip" onClick={() => show(id)} initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.6, opacity: 0 }} whileTap={{ scale: 0.9 }} transition={bouncy}>
+                        <Glyph name="add" size={18} />
+                        {t.blocks[id]}
+                      </motion.button>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </main>
 
       <AnimatePresence>
         {sheet && (
