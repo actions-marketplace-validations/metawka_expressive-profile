@@ -1,6 +1,6 @@
 # Expressive Profile
 
-Generator of GitHub profile READMEs in the Material 3 Expressive style. The profile is set up on the site and installed into the profile repository. A GitHub Action then refreshes the stats every day.
+Generator of GitHub profile READMEs in the Material 3 Expressive style. The profile is set up on the site and installed into the profile repository. A GitHub Action then refreshes the stats every hour.
 
 <p align="center">
   <a href="https://metawka.github.io/expressive-profile/"><b>Open the generator</b></a>
@@ -20,7 +20,7 @@ Generator of GitHub profile READMEs in the Material 3 Expressive style. The prof
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/metawka/metawka/main/assets/streak-dark.svg"><img src="https://raw.githubusercontent.com/metawka/metawka/main/assets/streak-light.svg" width="100%" alt="Streak"></picture>
 
-<sub>Live cards from <a href="https://github.com/metawka">github.com/metawka</a>, refreshed daily by the Action. The look follows the GitHub light or dark theme.</sub>
+<sub>Live cards from <a href="https://github.com/metawka">github.com/metawka</a>, refreshed hourly by the Action. The look follows the GitHub light or dark theme.</sub>
 
 </div>
 
@@ -80,7 +80,7 @@ Manual setup: **Download archive** gives a ZIP for a public repository named exa
 
 Signing in uses the GitHub device flow with the `public_repo` and `workflow` scopes. The token stays in the browser tab and is used only for this upload. The sign-in proxy is open source, see [`proxy/`](proxy). If the repository already has a README, the generator asks before replacing it.
 
-The first workflow run replaces the preview data with exact stats and pinned repositories. Then the profile updates once a day and commits only when something changed.
+The first workflow run replaces the preview data with exact stats and pinned repositories. Then the profile updates every hour and commits only when the data changes, plus once a day for the calendar.
 
 To change the profile later, edit `profile.json` in the repository or set it up again on the site and upload the new `profile.json`.
 
@@ -99,7 +99,7 @@ name: Expressive Profile
 
 on:
   schedule:
-    - cron: "17 3 * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
   push:
     paths:
