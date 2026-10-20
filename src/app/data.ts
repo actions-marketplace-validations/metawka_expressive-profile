@@ -230,7 +230,7 @@ const WORKFLOW = `name: Expressive Profile
 
 on:
   schedule:
-    - cron: "17 3 * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
   push:
     paths:

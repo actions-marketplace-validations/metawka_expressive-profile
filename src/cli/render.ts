@@ -124,7 +124,8 @@ async function main() {
   const data = await fetchData(config.login);
   const ava = await avatar(config.login);
   const { days, ...rest } = data;
-  const key = hash(JSON.stringify({ rest, avatar: ava ? hash(ava) : null, config }));
+  const day = new Date().toISOString().slice(0, 10);
+  const key = hash(JSON.stringify({ rest, day, avatar: ava ? hash(ava) : null, config }));
   if (process.env.GITHUB_EVENT_NAME === "schedule" && cached?.key === key) {
     console.log("no changes");
     return;
