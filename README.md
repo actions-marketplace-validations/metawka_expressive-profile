@@ -126,6 +126,10 @@ jobs:
 
 With the default token the language chart counts public repositories only. Private repositories are counted with a personal access token saved as the `PROFILE_TOKEN` secret.
 
+## Privacy
+
+The generator site counts visits with [GoatCounter](https://www.goatcounter.com/) on `metawka.github.io` only. No cookies are used and no personal data is stored.
+
 ## Development
 
 Requirements: Node.js 20 or newer.
